@@ -1,5 +1,5 @@
 <?php
-   
+
     // === CAPTURA DE ERRO ===
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -11,7 +11,7 @@
     $dbname = "cardapio";
 
     $conn = mysqli_connect ($servidor, $usuario, $senha, $dbname);
-    
+
     if (!$conn) {
             die("Erro na conexão: " . mysqli_connect_error());
         }

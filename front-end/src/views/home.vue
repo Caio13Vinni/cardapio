@@ -7,7 +7,7 @@
         <p>Atualize pratos, categorias, identidade visual e publique seu menu por link e QR Code sem depender de programador.</p>
         <button class="btn-primary">Criar conta grátis</button>
       </div>
-      
+
       <div class="hero-images">
         <img src="../assets/notebook.svg" alt="Cardápio Digital">
         <img src="../assets/celular.svg" alt="Cardápio Digital Mobile">
@@ -159,7 +159,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 80px 100px;  
+  padding: 80px 100px;
   background: linear-gradient(135deg, #fff5f7 0%, #f0f9ff 100%);
   gap: 80px;
 }

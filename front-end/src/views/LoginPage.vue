@@ -67,7 +67,7 @@ const handleLogin = async () => {
 
   try {
     // IMPORTANTE: MUDAR ESSA PORRA QUANDO HOSPEDAR NA AWS!! CONFIGURAR A .ENV DISSO
-    const urlBackend = 'http://localhost/cardapio-Full/back-end/valida.php';
+    const urlBackend = '/cardapio/back-end/valida.php';
 
     const response = await fetch(urlBackend, {
       method: 'POST',
@@ -85,9 +85,9 @@ const handleLogin = async () => {
 
     if (data.success) {
 
-      localStorage.setItem('token_cardapio', data.user.id);
-      
-      router.push('/dashboard'); 
+     localStorage.setItem('token_cardapio', data.user.id);
+
+      router.push('/dashboard');
     } else {
       erro.value = data.message;
     }

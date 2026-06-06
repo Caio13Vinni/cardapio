@@ -5,7 +5,7 @@ session_start();
         {
         echo json_encode([
             "success" => false,
-            "message" => "Usuário ou senha incorretos!" 
+            "message" => "Usuário ou senha incorretos!"
              ]);
              exit;
         }

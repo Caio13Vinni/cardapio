@@ -6,7 +6,7 @@ if ($data) {
     $_POST = $data;
 }
 
-header("Access-Control-Allow-Origin: http://localhost:8080");
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -30,11 +30,11 @@ $cardapioLogin = $_POST['cardapioLogin'] ?? null;
 if ($cardapioLogin) {
     $email = $_POST['email'] ?? '';
     $senha = $_POST['senha'] ?? '';
-   
+
     if(!empty($email) && !empty($senha)){
         $email_seguro = mysqli_real_escape_string($conn, $email);
         $sql = "SELECT id, nome, email, senha FROM usuarios WHERE email = '$email_seguro' LIMIT 1";
-        
+
         $resultado_execucao = mysqli_query($conn, $sql);
 
         if($resultado_execucao) {
@@ -43,7 +43,7 @@ if ($cardapioLogin) {
             if($row_usuario && password_verify($senha, $row_usuario['senha'])){
                 $_SESSION['id'] = $row_usuario['id'];
                 $_SESSION['nome'] = $row_usuario['nome'];
-                
+
                 echo json_encode([
                     "success" => true,
                     "message" => "Login realizado com sucesso",
