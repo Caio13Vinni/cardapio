@@ -10,7 +10,7 @@
 
       <p class="subtitle">
         Comece a gerenciar seu cardápio digital agora[cite: 1]
-      </p>
+      </p>a
 
       <!-- Mensagens de Feedback de erro ou sucesso -->
       <p v-if="mensagemFeedback" :class="['feedback-msg', statusSucesso ? 'msg-sucesso' : 'msg-erro']">
