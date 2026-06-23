@@ -15,6 +15,11 @@ import Preview from '../views/Preview.vue'
 import EditarCategoria from '../views/EditarCategoria.vue'
 import NovoPrato from '../views/NovoPrato.vue'
 import EditarPrato from '../views/EditarPrato.vue'
+import RecuperarSenha from '../views/RecuperarSenha.vue'
+import RedefinirSenha from '../views/RedefinirSenha.vue'
+import EmailEnviado from '../views/EmailEnviado.vue'
+import Erro404 from '../views/Erro404.vue'
+import CardapioCliente from '../views/CardapioCliente.vue'
 
 const routes = [
   {
@@ -30,6 +35,27 @@ const routes = [
     path: '/cadastro',
     component: RegisterPage,
     meta: { guestOnly: true }
+  },
+  {
+    path: '/recuperar-senha',
+    component: RecuperarSenha,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/email-enviado',
+    component: EmailEnviado,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/redefinir-senha',
+    component: RedefinirSenha,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/cardapio-cliente',
+    name: 'CardapioCliente',
+    component: CardapioCliente
+    // Rota totalmente livre: o cliente do restaurante não precisa de login para ver o cardápio
   },
   {
     path: '/dashboard',
@@ -81,6 +107,11 @@ const routes = [
         component: Preview
       }
     ]
+  },
+  // O 404 SEMPRE na última linha: se a URL digitada não bateu com nada acima, cai aqui.
+  {
+    path: '/:pathMatch(.*)*',
+    component: Erro404
   }
 ]
 
@@ -93,7 +124,6 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const estaLogado = !!localStorage.getItem('id_restaurante');
 
-  // Se a rota exige login e ele NÃO está logado, manda pro /login
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!estaLogado) {
       next('/login');
