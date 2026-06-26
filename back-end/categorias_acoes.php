@@ -51,6 +51,12 @@ if ($metodo === 'POST') {
 
     $id_restaurante = intval($dados['id_restaurante']);
     $nome = trim($dados['nome']);
+
+    // Verifica tamanho do nome
+    if (mb_strlen($nome) < 2 || mb_strlen($nome) > 60) {
+        echo json_encode(["sucesso" => false, "success" => false, "mensagem" => "O nome da categoria deve ter entre 2 e 60 caracteres."]);
+        exit;
+    }
     $descricao = trim($dados['descricao'] ?? '');
     $ativo = isset($dados['ativo']) ? intval($dados['ativo']) : 1;
 
@@ -100,6 +106,16 @@ if ($metodo === 'DELETE') {
     }
 
     try {
+        // Verifica se tem pratos vinculados
+        $stmtPratos = $pdo->prepare("SELECT COUNT(*) as total FROM pratos WHERE id_categoria = ?");
+        $stmtPratos->execute([$id]);
+        $totalPratos = $stmtPratos->fetch()['total'];
+
+        if ($totalPratos > 0) {
+            echo json_encode(["sucesso" => false, "success" => false, "mensagem" => "Não é possível excluir uma categoria com pratos vinculados. Remova os pratos primeiro."]);
+            exit;
+        }
+
         $stmt = $pdo->prepare("DELETE FROM categorias WHERE id = ?");
         $stmt->execute([$id]);
 

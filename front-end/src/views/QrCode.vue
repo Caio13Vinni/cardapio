@@ -99,7 +99,7 @@ export default {
     const dominioBase = window.location.protocol + '//' + window.location.host;
     
     // Constrói a URL apontando para o seu arquivo PHP
-    this.urlPublica = `${dominioBase}/cardapio/back-end/cardapio_publico.php?id=${this.idRestaurante}`;
+    this.urlPublica = `${dominioBase}/cardapio-cliente?id=${this.idRestaurante}`;
 
     // Passa a URL do cardápio para a API que desenha o QR Code na tela (tamanho 500x500 garante boa resolução)
     this.qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(this.urlPublica)}`;

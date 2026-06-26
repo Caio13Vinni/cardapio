@@ -8,47 +8,36 @@
 
     <div class="preview-container">
 
-      <div class="restaurant-card" :style="{ borderTop: `8px solid ${aparencia.cor_primaria || '#ef2020'}` }">
-        <img
-          class="logo"
-          :src="aparencia.logo || require('../assets/imgRestaurante.svg')"
-          alt="Logo"
-        >
+      <div class="restaurant-card" :style="{ borderTop: `8px solid ${aparencia.cor_primaria || '#ef2020'}`, backgroundImage: aparencia.banner ? `url(${aparencia.banner})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }">
+        <img class="logo" :src="aparencia.logo || require('../assets/imgRestaurante.svg')" alt="Logo">
 
         <h2>{{ restaurante.nome || 'Restaurante Don Giovanni' }}</h2>
+        <p class="subtitle">{{ restaurante.descricao || 'Cozinha italiana tradicional com toques contemporâneos' }}</p>
 
-        <p class="subtitle">
-          {{ restaurante.descricao || 'Cozinha italiana tradicional com toques contemporâneos' }}
-        </p>
         <div class="info">
-          <span>
-            {{ restaurante.endereco ? `${restaurante.endereco} - ${restaurante.bairro} ${restaurante.cidade} - ${restaurante.estado}` : 'Rua dos pinheiros, 123 -  Pinheiros São Paulo - SP' }}
-          </span>
+          <span>{{ restaurante.endereco ? `${restaurante.endereco} - ${restaurante.bairro} ${restaurante.cidade} - ${restaurante.estado}` : 'Rua dos pinheiros, 123 - Pinheiros São Paulo - SP' }}</span>
           <span>{{ restaurante.telefone || '(11) 3456-4673' }}</span>
           <span>{{ restaurante.horarios || 'Ter-Dom: 12h-15h e 19h-23h' }}</span>
         </div>
+
         <hr>
+
         <div class="info">
-        <div class="item" v-if="restaurante.instagram || !carregado">
+          <div class="item" v-if="restaurante.instagram || !carregado">
             <img src="../assets/instagram.svg" alt="Insta">
             <span>{{ restaurante.instagram || '@dongiovanni' }}</span>
           </div>
-
           <div class="item" v-if="restaurante.facebook || !carregado">
             <img src="../assets/facebook.svg" alt="Face">
             <span>{{ restaurante.facebook || 'dongiovanni' }}</span>
           </div>
-
           <div class="item" v-if="restaurante.website || !carregado">
             <span>{{ restaurante.website || 'www.dongiovanni.com.br' }}</span>
           </div>
         </div>
-
       </div>
-      
 
       <div class="categories" v-if="categorias.length > 0">
-
         <button
           v-for="categoria in categorias"
           :key="categoria"
@@ -58,32 +47,18 @@
         >
           {{ categoria }}
         </button>
-
       </div>
 
       <h3 v-if="categorias.length > 0">{{ categoriaSelecionada }}</h3>
 
       <div class="pratos-grid">
-
-        <div
-          class="prato-card"
-          v-for="prato in pratosFiltrados"
-          :key="prato.id"
-        >
-          <img
-            :src="prato.imagem"
-            :alt="prato.nome"
-          >
-
+        <div class="prato-card" v-for="prato in pratosFiltrados" :key="prato.id">
+          <img :src="prato.imagem" :alt="prato.nome">
           <div class="content">
             <h4 :style="{ color: aparencia.cor_secundaria || '#1a1a1a' }">{{ prato.nome }}</h4>
-
-            <span class="preco" :style="{ color: aparencia.cor_primaria || '#ef2020' }">
-              R$ {{ prato.preco }}
-            </span>
+            <span class="preco" :style="{ color: aparencia.cor_primaria || '#ef2020' }">R$ {{ prato.preco }}</span>
           </div>
         </div>
-
       </div>
 
       <div v-if="carregado && pratos.length === 0" style="text-align: center; margin-top: 40px; color: #999;">
@@ -91,7 +66,6 @@
       </div>
 
     </div>
-
   </div>
 </template>
 
@@ -102,11 +76,9 @@ export default {
   data() {
     return {
       idRestaurante: null,
-      carregado: false, // Flag para saber se já terminou de buscar no banco
-      
+      carregado: false,
       restaurante: {},
       aparencia: {},
-      
       categoriaSelecionada: '',
       categorias: [],
       pratos: []
@@ -115,10 +87,7 @@ export default {
 
   computed: {
     pratosFiltrados() {
-      // Filtra os pratos dinamicamente com base na categoria que o usuário clicou
-      return this.pratos.filter(
-        prato => prato.categoria === this.categoriaSelecionada
-      )
+      return this.pratos.filter(prato => prato.categoria === this.categoriaSelecionada)
     }
   },
 
@@ -128,12 +97,10 @@ export default {
       this.$router.push('/login');
       return;
     }
-
     this.carregarDadosDoPreview();
   },
 
   methods: {
-    // Faz múltiplas chamadas simultâneas para montar todo o cardápio
     async carregarDadosDoPreview() {
       try {
         const [resDados, resAparencia, resCategorias, resPratos] = await Promise.all([
@@ -143,42 +110,39 @@ export default {
           fetch(`/cardapio/back-end/pratos_acoes.php?id_restaurante=${this.idRestaurante}`).then(r => r.json())
         ]);
 
-        // 1. Dados Básicos
+        // 1. Dados do restaurante
         if (!resDados.erro) this.restaurante = resDados;
 
-        // 2. Aparência (Cores e Logo)
-        if (!resAparencia.erro) {
-          this.aparencia = resAparencia;
-          // Corrige a URL da logo caso venha do banco
+        // 2. Aparência — o PHP retorna { sucesso, aparencia: {...} }
+        if (resAparencia.sucesso) {
+          this.aparencia = resAparencia.aparencia || {};
           if (this.aparencia.logo && !this.aparencia.logo.includes('http')) {
             this.aparencia.logo = `/cardapio/back-end/${this.aparencia.logo}`;
           }
+          if (this.aparencia.banner && !this.aparencia.banner.includes('http')) {
+            this.aparencia.banner = `/cardapio/back-end/${this.aparencia.banner}`;
+          }
         }
 
-        // 3. Categorias Ativas
+        // 3. Categorias
         if (Array.isArray(resCategorias)) {
-          // Pega apenas as categorias que estão com "ativo = 1" e extrai só o nome para manter a lógica original do HTML
           this.categorias = resCategorias
             .filter(c => parseInt(c.ativo) === 1)
             .map(c => c.nome);
-
-          // Seleciona a primeira categoria automaticamente, se houver
           if (this.categorias.length > 0) {
             this.categoriaSelecionada = this.categorias[0];
           }
         }
 
-        // 4. Pratos Ativos
+        // 4. Pratos
         if (Array.isArray(resPratos)) {
           this.pratos = resPratos
             .filter(p => parseInt(p.ativo) === 1)
             .map(p => {
-              // Verifica se tem imagem. Se não tiver, exibe um placeholder neutro
-              let imgUrl = 'https://picsum.photos/400/300?grayscale'; 
+              let imgUrl = 'https://picsum.photos/400/300?grayscale';
               if (p.imagem) {
                 imgUrl = p.imagem.includes('http') ? p.imagem : `/cardapio/back-end/${p.imagem}`;
               }
-
               return {
                 id: p.id,
                 categoria: p.categoria || 'Sem categoria',
@@ -190,7 +154,7 @@ export default {
         }
 
       } catch (error) {
-        console.error("Erro ao carregar preview do cardápio:", error);
+        console.error("Erro ao carregar preview:", error);
       } finally {
         this.carregado = true;
       }
@@ -200,125 +164,25 @@ export default {
 </script>
 
 <style scoped>
-/* O CSS SEGUROU 100% DAS SUAS REGRAS, SEM ALTERAÇÕES! */
-.preview-page {
-  padding: 30px;
-}
-
-.preview-container {
-  background: #eef0ff;
-  padding: 40px;
-  border-radius: 30px;
-}
-
-.restaurant-card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,.1);
-}
-
-.logo {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.restaurant-card h2 {
-  margin-top: 15px;
-  font-size: 42px;
-}
-
-.subtitle {
-  color: #666;
-}
-
-.info {
-  display: flex;
-  justify-content: center;
-  gap: 100px;
-  margin-top: 20px;
-  padding: 10px 30px;
-  font-family: sans-serif;
-}
-
-.info .item {
-  display: flex;
-  align-items: center;
-  gap: 8px; 
-}
-
-.info .item img {
-  width: 18px;
-  height: 18px;
-}
-
-.categories {
-  margin-top: 25px;
-  background: white;
-  border-radius: 20px;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-}
-
-.categories button {
-  border: none;
-  background: transparent;
-  padding: 15px 100px;
-  border-radius: 15px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 30px;
-  transition: all 0.3s;
-}
-
-.categories button.active {
-  background: #ef2020;
-  color: white;
-}
-
-.pratos-grid {
-  margin-top: 25px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
-  gap: 20px;
-}
-
-.prato-card {
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
-}
-
-.prato-card img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-}
-
-.content {
-  padding: 20px;
-}
-
-.content h4 {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.preco {
-  color: #ef2020;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-hr {
-  display: flex;
-  width: 800px;
-  margin: auto;
-  margin-top: 10px;
-}
+.preview-page { padding: 30px; }
+.preview-container { background: #eef0ff; padding: 40px; border-radius: 30px; }
+.banner-container { width: 100%; margin-bottom: 20px; border-radius: 14px; overflow: hidden; }
+.banner { width: 100%; height: 250px; object-fit: cover; display: block; }
+.restaurant-card { background: white; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,.1); }
+.logo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; }
+.restaurant-card h2 { margin-top: 15px; font-size: 42px; }
+.subtitle { color: #666; }
+.info { display: flex; justify-content: center; gap: 100px; margin-top: 20px; padding: 10px 30px; font-family: sans-serif; }
+.info .item { display: flex; align-items: center; gap: 8px; }
+.info .item img { width: 18px; height: 18px; }
+.categories { margin-top: 25px; background: white; border-radius: 20px; padding: 10px; display: flex; gap: 10px; justify-content: space-between; }
+.categories button { border: none; background: transparent; padding: 15px 100px; border-radius: 15px; cursor: pointer; font-weight: 600; font-size: 30px; transition: all 0.3s; }
+.categories button.active { background: #ef2020; color: white; }
+.pratos-grid { margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); gap: 20px; }
+.prato-card { background: white; border-radius: 15px; overflow: hidden; }
+.prato-card img { width: 100%; height: 250px; object-fit: cover; }
+.content { padding: 20px; }
+.content h4 { font-size: 28px; margin-bottom: 10px; }
+.preco { color: #ef2020; font-size: 28px; font-weight: bold; }
+hr { display: flex; width: 800px; margin: auto; margin-top: 10px; }
 </style>

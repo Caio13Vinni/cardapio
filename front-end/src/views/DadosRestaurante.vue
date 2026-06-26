@@ -178,6 +178,33 @@ export default {
     },
     
     salvarDados() {
+      // Validações frontend
+      const erros = [];
+      const nome = (this.form.nome || '').trim();
+      const email = (this.form.email || '').trim();
+      const telefone = (this.form.telefone || '').trim();
+      const endereco = (this.form.endereco || '').trim();
+      const horarios = (this.form.horarios || '').trim();
+      const instagram = (this.form.instagram || '').trim();
+      const facebook = (this.form.facebook || '').trim();
+      const website = (this.form.website || '').trim();
+
+      if (!nome) erros.push("O nome do restaurante é obrigatório. (RN059)");
+      else if (nome.length < 2 || nome.length > 120) erros.push("O nome deve ter entre 2 e 120 caracteres. (RN060)");
+      if (telefone.length > 20) erros.push("O telefone deve ter no máximo 20 caracteres. (RN062)");
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) erros.push("O e-mail deve ter formato válido. (RN063)");
+      if (email.length > 150) erros.push("O e-mail deve ter no máximo 150 caracteres. (RN064)");
+      if (endereco.length > 255) erros.push("O endereço deve ter no máximo 255 caracteres. (RN065)");
+      if (horarios.length > 255) erros.push("O horário deve ter no máximo 255 caracteres. (RN066)");
+      if (instagram.length > 100) erros.push("O Instagram deve ter no máximo 100 caracteres. (RN067)");
+      if (facebook.length > 100) erros.push("O Facebook deve ter no máximo 100 caracteres. (RN068)");
+      if (website.length > 255) erros.push("O Website deve ter no máximo 255 caracteres. (RN069)");
+
+      if (erros.length > 0) {
+        alert(erros.join("\n"));
+        return;
+      }
+
       this.loading = true;
       const urlBackend = '/cardapio/back-end/dados_restaurante.php';
       

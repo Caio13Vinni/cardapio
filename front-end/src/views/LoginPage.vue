@@ -85,7 +85,7 @@ const handleLogin = async () => {
 
     if (data.success) {
 
-     localStorage.setItem('token_cardapio', data.user.id);
+     localStorage.setItem('id_restaurante', data.user.id);
 
       router.push('/dashboard');
     } else {

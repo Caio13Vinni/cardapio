@@ -3,65 +3,60 @@ require_once 'conexao.php';
 
 $metodo = $_SERVER['REQUEST_METHOD'];
 
-// 1. CARREGAR INFORMAÇÕES DO PERFIL (GET)
 if ($metodo === 'GET') {
-    if (!isset($_GET['id_restaurante'])) {
-        echo json_encode(["erro" => true, "mensagem" => "ID do restaurante não fornecido."]);
-        exit;
+    if (!isset($_GET['id_restaurante'])) {/var/www/html/cardapio/
+    // RN060 - Nome entre 2 e 120 caracteres
+    elseif (mb_strlen($nome) < 2 || mb_strlen($nome) > 120) {
+        $erros[] = "O nome deve ter entre 2 e 120 caracteres.";
     }
 
-    $id = intval($_GET['id_restaurante']);
+    // RN062 - Telefone máx 20
+    $telefone = trim($d['telefone'] ?? '');
+    if (mb_strlen($telefone) > 20) {
+        $erros[] = "O telefone deve ter no máximo 20 caracteres.";
+    }
 
-    try {
-        $stmt = $pdo->prepare("SELECT nome, descricao, endereco, bairro, cep, cidade, estado, telefone, email, horarios, instagram, facebook, website FROM restaurantes WHERE id = ?");
-        $stmt->execute([$id]);
-        $perfil = $stmt->fetch();
+    // RN063 - Email formato válido
+    $email = trim($d['email'] ?? '');
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $erros[] = "O e-mail de contato deve ter formato válido. ";
+    }
 
-        if ($perfil) {
-            echo json_encode($perfil);
-        } else {
-            echo json_encode(["erro" => true, "mensagem" => "Estabelecimento não encontrado."]);
-        }
+    // RN064 - Email máx 150
+    if (mb_strlen($email) > 150) {
+        $erros[] = "O e-mail deve ter no máximo 150 caracteres. ";
+    }
+
+    // RN065 - Endereço máx 255
+    $endereco = trim($d['endereco'] ?? '');
+    if (mb_strlen($endereco) > 255) {
+        $erros[] = "O endereço deve ter no máximo 255 caracteres. ";
+    }
+
+    // RN066 - Horários máx 255
+    $horarios = trim($d['horarios'] ?? '');
+    if (mb_strlen($horarios) > 255) {/var/www/html/cardapio/airro=?, cep=?, cidade=?, estado=?, telefone=?, email=?, horarios=?, instagram=?, facebook=?, website=? WHERE id=?");
+        $stmt->execute([
+            $nome,
+            trim($d['descricao'] ?? ''),
+            $endereco,
+            trim($d['bairro'] ?? ''),
+            trim($d['cep'] ?? ''),
+            trim($d['cidade'] ?? ''),
+            trim($d['estado'] ?? ''),
+            $telefone,
+            $email,
+            $horarios,
+            $instagram,
+            $facebook,
+            $website,
+            $id
+        ]);
+        echo json_encode(["sucesso" => true, "mensagem" => "Informações atualizadas!"]);
     } catch (PDOException $e) {
-        echo json_encode(["erro" => true, "mensagem" => "Erro ao buscar perfil: " . $e->getMessage()]);
+        echo json_encode(["erro" => true, "mensagem" => "Erro: " . $e->getMessage()]);
     }
     exit;
 }
 
-// 2. SALVAR/ATUALIZAR INFORMAÇÕES (POST)
-if ($metodo === 'POST') {
-    $dadosRecebidos = json_decode(file_get_contents('php://input'), true);
-
-    if (!isset($dadosRecebidos['id_restaurante'])) {
-        echo json_encode(["erro" => true, "mensagem" => "ID do restaurante é obrigatório."]);
-        exit;
-    }
-
-    $id = intval($dadosRecebidos['id_restaurante']);
-    $nome = trim($dadosRecebidos['nome'] ?? '');
-    $descricao = trim($dadosRecebidos['descricao'] ?? '');
-    $endereco = trim($dadosRecebidos['endereco'] ?? '');
-    $bairro = trim($dadosRecebidos['bairro'] ?? '');
-    $cep = trim($dadosRecebidos['cep'] ?? '');
-    $cidade = trim($dadosRecebidos['cidade'] ?? '');
-    $estado = trim($dadosRecebidos['estado'] ?? '');
-    $telefone = trim($dadosRecebidos['telefone'] ?? '');
-    $email = trim($dadosRecebidos['email'] ?? '');
-    $horarios = trim($dadosRecebidos['horarios'] ?? '');
-    $instagram = trim($dadosRecebidos['instagram'] ?? '');
-    $facebook = trim($dadosRecebidos['facebook'] ?? '');
-    $website = trim($dadosRecebidos['website'] ?? '');
-
-    try {
-        $stmt = $pdo->prepare("UPDATE restaurantes SET nome = ?, descricao = ?, endereco = ?, bairro = ?, cep = ?, cidade = ?, estado = ?, telefone = ?, email = ?, horarios = ?, instagram = ?, facebook = ?, website = ? WHERE id = ?");
-        $stmt->execute([$nome, $descricao, $endereco, $bairro, $cep, $cidade, $estado, $telefone, $email, $horarios, $instagram, $facebook, $website, $id]);
-
-        echo json_encode(["sucesso" => true, "mensagem" => "Informações atualizadas com sucesso!"]);
-
-    } catch (PDOException $e) {
-        echo json_encode(["erro" => true, "mensagem" => "Erro ao salvar alterações: " . $e->getMessage()]);
-    }
-    exit;
-}
-
-echo json_encode(["erro" => true, "mensagem" => "Método não suportado."]);
+echo json_encode(["erro" => true, "mensagem" => "Método inválido."]);

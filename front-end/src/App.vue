@@ -18,7 +18,7 @@ import AppFooter from './components/AppFooter.vue'
 const route = useRoute()
 
 const ocultarLayout = computed(() => {
-  return ['/login', '/cadastro'].includes(route.path)
+  return route.path === '/' ? false : true
 })
 </script>
 

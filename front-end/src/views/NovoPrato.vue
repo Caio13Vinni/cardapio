@@ -177,8 +177,25 @@ export default {
     },
 
     criarPrato() {
-      if (!this.form.nome || !this.form.id_categoria || !this.form.preco) {
-        alert('Por favor, preencha os campos obrigatórios.');
+      const erros = [];
+      const preco = parseFloat(String(this.form.preco).replace(',', '.'));
+
+      // RN034 - Imagem obrigatória
+      if (!this.arquivoImagem) erros.push("A imagem do prato é obrigatória. (RN034)");
+
+      // Campo nome e categoria obrigatórios
+      if (!this.form.nome) erros.push("O nome do prato é obrigatório.");
+      if (!this.form.id_categoria) erros.push("A categoria é obrigatória.");
+
+      // RN030 - Preço >= 0
+      if (this.form.preco === '' || isNaN(preco) || preco < 0) erros.push("O preço deve ser maior ou igual a zero. (RN030)");
+
+      // RN031 - No máximo 2 casas decimais
+      const precoStr = String(this.form.preco).replace(',', '.');
+      if (/\.\d{3,}/.test(precoStr)) erros.push("O preço deve ter no máximo duas casas decimais. (RN031)");
+
+      if (erros.length > 0) {
+        alert(erros.join("\n"));
         return;
       }
 

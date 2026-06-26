@@ -158,7 +158,7 @@ export default {
   },
   methods: {
     fetchSystemStats() {
-      const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost/cardapio/back-end';
+      const apiUrl = process.env.VUE_APP_API_URL || 'http://52.87.180.100/cardapio/back-end';
       
       // Opcional: Bate em um arquivo de estatísticas públicas gerais do seu sistema
       fetch(`${apiUrl}/dashboard_dados.php?public_stats=true`)
