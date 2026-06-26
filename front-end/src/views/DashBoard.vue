@@ -6,8 +6,8 @@
         <h3>Cardápio publicado</h3>
         <p>Seu cardápio está ativo e acessível para os clientes</p>
         <div class="alert-buttons">
-          <button class="btn-secondary">Ver cardápio público</button>
-          <button class="btn-secondary">Baixar QR Code</button>
+          <button class="btn-secondary" @click="verCardapioPublico">Ver cardápio público</button>
+          <button class="btn-secondary" @click="baixarQrCode">Baixar QR Code</button>
         </div>
       </div>
     </div>
@@ -151,6 +151,8 @@ export default {
   data() {
     return {
       idRestaurante: null,
+      urlPublica: '',
+      qrCodeUrl: '',
       stats: {
         categorias: 0,
         pratosTotais: 0,
@@ -176,6 +178,11 @@ export default {
       this.$router.push('/login');
       return;
     }
+
+    // Mesma lógica usada em QrCode.vue, para os botões "Ver cardápio público" e "Baixar QR Code"
+    const dominioBase = window.location.protocol + '//' + window.location.host;
+    this.urlPublica = `${dominioBase}/cardapio-cliente?id=${this.idRestaurante}`;
+    this.qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(this.urlPublica)}`;
     
     // Chama a função para buscar os dados do PHP assim que a tela abre
     this.carregarDashboard();
@@ -189,6 +196,29 @@ export default {
     }
   },
   methods: {
+    verCardapioPublico() {
+      window.open(this.urlPublica, '_blank');
+    },
+
+    baixarQrCode() {
+      fetch(this.qrCodeUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const urlObj = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = urlObj;
+          link.download = `qrcode-restaurante-${this.idRestaurante}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(urlObj);
+        })
+        .catch(err => {
+          console.error('Erro no download direto:', err);
+          window.open(this.qrCodeUrl, '_blank');
+        });
+    },
+
     carregarDashboard() {
       // Usando o formato de URL que você pediu
       const urlBackend = `/cardapio/back-end/dashboard.php?id_restaurante=${this.idRestaurante}`;
