@@ -13,13 +13,13 @@ if ($dados && !empty($dados['token']) && !empty($dados['nova_senha'])) {
 
     try {
         // 1. Procura o utilizador pelo token e verifica se ainda está dentro do prazo de validade
-        $stmt = $pdo->prepare("SELECT id FROM restaurantes WHERE token_recuperacao = ? AND token_expiracao > ?");
+        $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE token_recuperacao = ? AND token_expiracao > ?");
         $stmt->execute([$token, $agora]);
         $restaurante = $stmt->fetch();
 
         if ($restaurante) {
             // 2. Atualiza a senha e limpa os campos de recuperação por segurança
-            $stmtUpdate = $pdo->prepare("UPDATE restaurantes SET senha = ?, token_recuperacao = NULL, token_expiracao = NULL WHERE id = ?");
+            $stmtUpdate = $pdo->prepare("UPDATE usuarios SET senha = ?, token_recuperacao = NULL, token_expiracao = NULL WHERE id = ?");
             $stmtUpdate->execute([$nova_senha, $restaurante['id']]);
 
             $retorno['sucesso'] = true;

@@ -115,7 +115,8 @@ export default {
 
         
         if (!resCardapio.sucesso) {
-          this.$router.push('/404');
+          // Direciona para a rota de erro 404 nomeada (ver router/index.js)
+          this.$router.replace({ name: 'Erro404' });
           return;
         }
 

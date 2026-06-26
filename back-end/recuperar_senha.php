@@ -11,7 +11,7 @@ if ($dados && !empty($dados['email'])) {
 
     try {
         // 1. Verifica se o e-mail existe
-        $stmt = $pdo->prepare("SELECT id, nome FROM restaurantes WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, nome FROM usuarios WHERE email = ?");
         $stmt->execute([$email]);
         $restaurante = $stmt->fetch();
 
@@ -21,7 +21,7 @@ if ($dados && !empty($dados['email'])) {
             $expiracao = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
             // 3. Salva o token no registo do restaurante
-            $stmtUpdate = $pdo->prepare("UPDATE restaurantes SET token_recuperacao = ?, token_expiracao = ? WHERE id = ?");
+            $stmtUpdate = $pdo->prepare("UPDATE usuarios SET token_recuperacao = ?, token_expiracao = ? WHERE id = ?");
             $stmtUpdate->execute([$token, $expiracao, $restaurante['id']]);
 
             // 4. Monta o link que o utilizador vai clicar no e-mail

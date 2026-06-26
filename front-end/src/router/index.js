@@ -111,6 +111,7 @@ const routes = [
   // O 404 SEMPRE na última linha: se a URL digitada não bateu com nada acima, cai aqui.
   {
     path: '/:pathMatch(.*)*',
+    name: 'Erro404',
     component: Erro404
   }
 ]

@@ -16,7 +16,7 @@ try {
         SELECT 
             r.nome, r.descricao, r.endereco, r.bairro, r.cidade, r.estado, r.telefone, r.horarios, r.instagram, r.facebook, r.website,
             a.cor_primaria, a.cor_secundaria, a.logo, a.banner
-        FROM restaurantes r
+        FROM usuarios r
         LEFT JOIN aparencia a ON r.id = a.id_restaurante
         WHERE r.id = ?
     ");
