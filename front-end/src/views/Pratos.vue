@@ -45,9 +45,14 @@
             <p class="prato-category">{{ prato.category }}</p>
             <p class="prato-price">R$ {{ prato.price }}</p>
             
-            <button class="btn-editar" @click="$router.push('/dashboard/pratos/editar/' + prato.id)">
-              Editar
-            </button>
+            <div class="prato-actions">
+              <button class="btn-editar" @click="$router.push('/dashboard/pratos/editar/' + prato.id)">
+                Editar
+              </button>
+              <button class="btn-icon btn-delete" @click="deletePrato(prato.id)" title="Excluir">
+                <img src="../assets/lixo.svg" alt="lixo">
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -86,6 +91,23 @@ export default {
     this.fetchPratos();
   },
   methods: {
+    deletePrato(id) {
+      if (confirm('Tem certeza que deseja excluir este prato?')) {
+        const urlBackend = `/cardapio/back-end/pratos_acoes.php?id=${id}`;
+
+        fetch(urlBackend, { method: 'DELETE' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.sucesso || data.success) {
+              this.pratos = this.pratos.filter(prato => prato.id !== id);
+            } else {
+              alert(data.mensagem || 'Erro ao excluir prato.');
+            }
+          })
+          .catch(err => console.error('Erro:', err));
+      }
+    },
+
     fetchPratos() {
       this.loading = true;
       const urlBackend = `/cardapio/back-end/pratos_acoes.php?id_restaurante=${this.idRestaurante}`;
@@ -286,13 +308,47 @@ export default {
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s;
-  margin-top: auto;
 }
 
 .btn-editar:hover {
   border-color: #ef2020;
   color: #ef2020;
   background-color: #fce4e4;
+}
+
+.prato-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.prato-actions .btn-editar {
+  flex: 1;
+  margin-top: 0;
+}
+
+.btn-icon {
+  background: white;
+  border: 1px solid #e8e8e8;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon img {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-icon.btn-delete:hover {
+  border-color: #ef2020;
+  background-color: #fee2e2;
 }
 
 /* RESPONSIVE */

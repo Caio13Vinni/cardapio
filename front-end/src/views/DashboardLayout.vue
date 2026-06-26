@@ -8,7 +8,7 @@
           <h1>{{ pageTitle }}</h1>
         </div>
         <div class="header-right">
-          <a :href="`/cardapio-cliente?id=${idRestaurante}`" target="_blank" class="header-link">
+          <a :href="`/cardapio/cardapio-cliente?id=${idRestaurante}`" target="_blank" class="header-link">
             Ver cardápio público
           </a>
           

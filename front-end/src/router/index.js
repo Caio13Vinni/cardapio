@@ -117,7 +117,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  // process.env.BASE_URL vem do publicPath definido em vue.config.js (/cardapio/)
+  history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
