@@ -9,7 +9,7 @@
       <h1>Criar nova conta</h1>
 
       <p class="subtitle">
-        Comece a gerenciar seu cardápio digital agora[cite: 1]
+        Comece a gerenciar seu cardápio digital agora
       </p>
 
       <!-- Mensagens de Feedback de erro ou sucesso -->
@@ -84,9 +84,9 @@
         </button>
 
         <p class="login-link">
-          Já tem uma conta?[cite: 1]
+          Já tem uma conta?
           <router-link to="/login">
-            Fazer login[cite: 1]
+            Fazer login
           </router-link>
         </p>
 

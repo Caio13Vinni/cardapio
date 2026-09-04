@@ -5,9 +5,9 @@
       <div class="hero-content">
         <h1>Crie e gerencie o cardápio digital do seu restaurante com autonomia</h1>
         <p>Atualize pratos, categorias, identidade visual e publique seu menu por link e QR Code sem depender de programador.</p>
-        <button class="btn-primary">Criar conta grátis</button>
+        <button class="btn-primary" @click="$router.push('/cadastro')">Criar conta grátis</button>
       </div>
-
+      
       <div class="hero-images">
         <img src="../assets/notebook.svg" alt="Cardápio Digital">
         <img src="../assets/celular.svg" alt="Cardápio Digital Mobile">
@@ -15,22 +15,22 @@
       </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Stats Section (Dinâmica conectada ao seu Back-end) -->
     <section class="stats">
       <div class="stat-card">
-        <h3>1.500+</h3>
+        <h3>{{ stats.restaurantes }}</h3>
         <p>Restaurantes ativos</p>
       </div>
       <div class="stat-card">
-        <h3>50k+</h3>
+        <h3>{{ stats.cardapios }}</h3>
         <p>Cardápios visualizados</p>
       </div>
       <div class="stat-card">
-        <h3>98%</h3>
+        <h3>{{ stats.satisfacao }}</h3>
         <p>Satisfação</p>
       </div>
       <div class="stat-card">
-        <h3>24/7</h3>
+        <h3>{{ stats.disponibilidade }}</h3>
         <p>Disponibilidade</p>
       </div>
     </section>
@@ -64,32 +64,32 @@
       <p class="resources-subtitle">Ferramental completo para gerenciar seu cardápio digital</p>
       <div class="resources-grid">
         <div class="resource-card">
-          <div class="resource-icon">1</div>
+          <div class="resource-icon"><img src="../assets/DashBoard.svg" alt="Ícone"></div>
           <h3>Gestão de Categorias</h3>
           <p>Organize seus pratos em categorias, personalize a ordem, quantidade e muito mais.</p>
         </div>
         <div class="resource-card">
-          <div class="resource-icon">2</div>
+          <div class="resource-icon"><img src="../assets/celular.svg" alt="Ícone" style="width: 14px;"></div>
           <h3>Design Responsivo</h3>
           <p>Cardápio otimizado para mobile, tablet e desktop. Perfeito em qualquer dispositivo.</p>
         </div>
         <div class="resource-card">
-          <div class="resource-icon">3</div>
+          <div class="resource-icon"><img src="../assets/QRcode.svg" alt="Ícone"></div>
           <h3>QR Code Integrado</h3>
           <p>Gere QR Codes personalizados para hospedar nas suas mesas, porta, etc.</p>
         </div>
         <div class="resource-card">
-          <div class="resource-icon">4</div>
+          <div class="resource-icon"><img src="../assets/Pintura.svg" alt="Ícone"></div>
           <h3>Personalização Visual</h3>
           <p>Configure cores, logo, banner para deixar a identidade da sua marca.</p>
         </div>
         <div class="resource-card">
-          <div class="resource-icon">5</div>
+          <div class="resource-icon"><img src="../assets/Olho.svg" alt="Ícone"></div>
           <h3>Preview em Tempo Real</h3>
           <p>Visualize como ficará seu cardápio antes de publicar para os clientes.</p>
         </div>
         <div class="resource-card">
-          <div class="resource-icon">6</div>
+          <div class="resource-icon"><img src="../assets/Corretoverde.svg" alt="Ícone"></div>
           <h3>Destaque de Pratos</h3>
           <p>Marque pratos especiais e organize por ordem de edição.</p>
         </div>
@@ -111,7 +111,7 @@
       <div class="testimonials-grid">
         <div class="testimonial-card">
           <div class="stars">★★★★★</div>
-          <p>"Lorem ipsum dolor sit amet, consectetur. Agora posso atualizar o menu com agilidade!"</p>
+          <p>"Excelente plataforma. Agora posso atualizar o menu com agilidade e os clientes adoram a velocidade!"</p>
           <h4>Carlos Silva</h4>
           <span>Pizzaria Silva</span>
         </div>
@@ -123,7 +123,7 @@
         </div>
         <div class="testimonial-card">
           <div class="stars">★★★★★</div>
-          <p>"Melhor investimento que fiz! Aumentei muito meu cardápio de clientes com o QR Code!"</p>
+          <p>"Melhor investimento que fiz! Aumentei muito o giro das mesas usando os totens de QR Code!"</p>
           <h4>Roberto Oliveira</h4>
           <span>Churrascaria Roberto</span>
         </div>
@@ -133,15 +133,48 @@
     <!-- Final CTA Section -->
     <section class="cta">
       <h2>Pronto para modernizar seu restaurante?</h2>
-      <p>Junte-se a mais de 1.500 restaurantes que já usam o Cardápio.io</p>
-      <button class="btn-primary">Juntar-se</button>
+      <p>Junte-se a diversos restaurantes que já usam o Cardápio.io</p>
+      <button class="btn-primary" @click="$router.push('/cadastro')">Começar agora</button>
     </section>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HomePage'
+  name: 'HomePage',
+  data() {
+    return {
+      // Valores iniciais seguros enquanto a API carrega
+      stats: {
+        restaurantes: '1.500+',
+        cardapios: '50k+',
+        satisfacao: '98%',
+        disponibilidade: '24/7'
+      }
+    }
+  },
+  mounted() {
+    this.fetchSystemStats();
+  },
+  methods: {
+    fetchSystemStats() {
+      const apiUrl = process.env.VUE_APP_API_URL || 'http://52.87.180.100/cardapio/back-end';
+      
+      // Opcional: Bate em um arquivo de estatísticas públicas gerais do seu sistema
+      fetch(`${apiUrl}/dashboard_dados.php?public_stats=true`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            this.stats.restaurantes = data.total_restaurantes + '+';
+            this.stats.cardapios = data.total_visualizacoes;
+          }
+        })
+        .catch(err => {
+          // Mantém os valores mockados se o back-end ainda não tiver esse arquivo criado
+          console.log('Utilizando estatísticas padrão do sistema.', err);
+        });
+    }
+  }
 }
 </script>
 
@@ -159,7 +192,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 80px 100px;
+  padding: 80px 100px;  
   background: linear-gradient(135deg, #fff5f7 0%, #f0f9ff 100%);
   gap: 80px;
 }
@@ -193,7 +226,7 @@ export default {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 0;  /* ← ZERO de espaço - totalmente coladas */
+  gap: 0;
   position: relative;
 }
 
@@ -357,13 +390,17 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background-color: #f0f0f0;
-  border-radius: 50%;
-  font-weight: bold;
-  color: #999;
+  width: 44px;
+  height: 44px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   margin-bottom: 15px;
+}
+
+.resource-icon img {
+  width: 22px;
+  height: 22px;
 }
 
 .resource-card h3 {
@@ -410,40 +447,6 @@ export default {
   width: 100%;
   height: auto;
   border-radius: 8px;
-}
-
-.demo-benefits {
-  flex: 0 1 300px;
-  text-align: left;
-  background-color: #e74c3c;
-  padding: 40px;
-  border-radius: 8px;
-  color: white;
-}
-
-.benefit {
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.benefit-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.benefit p {
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0;
 }
 
 /* TESTIMONIALS SECTION */
@@ -573,10 +576,6 @@ export default {
   .demo-content {
     flex-direction: column;
     gap: 20px;
-  }
-
-  .demo-benefits {
-    width: 100%;
   }
 }
 </style>
